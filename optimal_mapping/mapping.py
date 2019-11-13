@@ -11,6 +11,10 @@ class Mapping:
         self._horizontal_lines = list()
         self._zeros_scratched = set()
 
+    @property
+    def total_zero_values(self):
+        return self.matrix_size ** 2 - np.count_nonzero(self.matrix)
+
     # Phase 1: Rows and Columns reductions
     def _rows_reductions(self):
         for row in self.matrix:
@@ -36,7 +40,7 @@ class Mapping:
     # i) Starting from the first column, ask the question: is the exactly one zero in that column? If yes, make
     # a square around that zero and draw a horizontal line passing through that zero; Otherwise skip that column.
     # ii) After scanning the last column, check whether all the zeros are covered with lines.
-    #
+    # REPEAT ROW AND COLUMN SCANNING UNTIL ALL ZEROS ARE COVERED WITH LINES
     # Step 02:
 
     def _rows_scanning(self):
@@ -56,8 +60,22 @@ class Mapping:
             zeros_from_column = np.where(column == 0)[0]
             self._zeros_scratched |= {(x, vertical_line) for x in zeros_from_column}
 
+    def _columns_scanning(self):
+        for y, column in enumerate(self.matrix.transpose()):
+            zeros_from_column = [(x, y) for x in np.where(column == 0)[0]]
+            zeros_from_column = [zero for zero in zeros_from_column if zero not in self._zeros_scratched]
 
+            if len(zeros_from_column) != 1:
+                continue
 
+            chosen_zero = zeros_from_column.pop()
+            horizontal_line = chosen_zero[0]
+            self._chosen_zeros.append(chosen_zero)
+            self._horizontal_lines.append(horizontal_line)
+
+            row = self.matrix[horizontal_line]
+            zeros_from_row = np.where(row == 0)[0]
+            self._zeros_scratched |= {(horizontal_line, y) for y in zeros_from_row}
 
 
     ########################## !!!!!!!!!!!!!!!! ATENCAO
@@ -65,4 +83,4 @@ class Mapping:
     # Pensando agora por esse mesmo motivo precisa guardar as posicões dos zeros sublinhados, pra não sublinhar duas vezes
 
     def _total_zero_values(self):
-        return self.matrix_size * self.matrix_size - np.count_nonzero(self.matrix)
+        return self.matrix_size ** 2 - np.count_nonzero(self.matrix)

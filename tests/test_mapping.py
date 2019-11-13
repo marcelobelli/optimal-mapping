@@ -14,6 +14,14 @@ def matrix():
     ]
 
 
+def test_total_zero_values():
+    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+
+    mapping = Mapping(matrix)
+
+    assert mapping.total_zero_values == 7
+
+
 def test_rows_reductions(matrix):
     expected_result = np.array([[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]])
     mapping = Mapping(matrix)
@@ -70,3 +78,12 @@ def test_columns_scanning_doesnt_cadd_horizontal_lines_if_finds_more_than_one_ze
     mapping._columns_scanning()
 
     assert mapping._horizontal_lines == []
+
+
+def test_rows_scanning():
+    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+
+    mapping = Mapping(matrix)
+    mapping._columns_scanning()
+
+    assert mapping._chosen_zeros == [(3, 1), (2, 2), (0, 4)]
