@@ -1,7 +1,7 @@
 # python 3.8.0
 import numpy as np
 
-
+# Renomear para RouteAnalizer?
 class Mapping:
     def __init__(self, matrix):
         self.matrix = np.array(matrix)
@@ -15,7 +15,32 @@ class Mapping:
     def total_zero_values(self):
         return self.matrix_size ** 2 - np.count_nonzero(self.matrix)
 
-    # Phase 1: Rows and Columns reductions
+    def run(self):
+        # Phase 1
+        self.matrix_reduction()
+
+        # Phase 2
+        while True:
+            self.matrix_scanning()
+
+            if len(self._chosen_zeros) == self.matrix_size:
+                break
+
+        return self._chosen_zeros
+
+    def matrix_reduction(self):
+        self._rows_reductions()
+        self._columns_reductions()
+
+    def matrix_scanning(self):
+        self._reset_scanning_values()
+
+        while len(self._zeros_scratched) != self.total_zero_values:
+            self._rows_scanning()
+            if len(self._chosen_zeros) == self.matrix_size:
+                break
+            self._columns_scanning()
+
     def _rows_reductions(self):
         for row in self.matrix:
             min_value = min(row)
@@ -28,20 +53,6 @@ class Mapping:
             for i in range(self.matrix_size):
                 column[i] -= min_value
 
-    # Phase 2: Optimization of the problem
-    # Step 01: Draw a minimum numbers of lines to cover all the zeros of the matrix
-    # Procedure
-    # a) Row Scanning
-    # i) Starting from the first row, ask the question: is the exactly one zero in that row? If yes, make
-    # a square around that zero and draw a vertical line passing through that zero; Otherwise skip that row.
-    # ii) After scanning the last row, check whether all the zeros are covered with lines. If yes, go to Step 2;
-    # Otherwise, do column scanning.
-    # b) Column Scanning
-    # i) Starting from the first column, ask the question: is the exactly one zero in that column? If yes, make
-    # a square around that zero and draw a horizontal line passing through that zero; Otherwise skip that column.
-    # ii) After scanning the last column, check whether all the zeros are covered with lines.
-    # REPEAT ROW AND COLUMN SCANNING UNTIL ALL ZEROS ARE COVERED WITH LINES
-    # Step 02:
 
     def _rows_scanning(self):
         for x, row in enumerate(self.matrix):
@@ -77,10 +88,35 @@ class Mapping:
             zeros_from_row = np.where(row == 0)[0]
             self._zeros_scratched |= {(horizontal_line, y) for y in zeros_from_row}
 
+    def _reset_scanning_values(self):
+        self._chosen_zeros = list()
+        self._vertical_lines = list()
+        self._horizontal_lines = list()
+        self._zeros_scratched = set()
 
-    ########################## !!!!!!!!!!!!!!!! ATENCAO
-    # No scanning horizontal além da condicao if 0 < len((zero_index := np.where(column == 0)[0])) < 2: tem que ver o zero foi riscado.
-    # Pensando agora por esse mesmo motivo precisa guardar as posicões dos zeros sublinhados, pra não sublinhar duas vezes
+    # Step 3: Identify the min value of the undeleted cell values
+    # a) add the min undeleted value at the intersection points of the present matrix
+    # b) subtract the minimum undeleted cell value from all the undeleted cell values
+    # c) All other entries remain the same
+    # Step 4: Start phase 2 again
 
-    def _total_zero_values(self):
-        return self.matrix_size ** 2 - np.count_nonzero(self.matrix)
+    @property
+    def _intersection_points(self):
+        return {(x, y) for x in self._horizontal_lines for y in self._vertical_lines}
+
+    def _sum_value_at_intersection_points(self, value):
+        for point in self._intersection_points:
+            self.matrix[point[0]][point[1]] += value
+
+    def _get_undeleted_cells(self):
+        clear_rows = [row for row in range(self.matrix_size) if row not in self._horizontal_lines]
+        clear_columns = [column for column in range(self.matrix_size) if column not in self._vertical_lines]
+
+        return [(x, y) for x in clear_rows for y in clear_columns]
+
+    def _get_min_value_from_undeleted_cells(self):
+        return min([self.matrix[cell[0]][cell[1]] for cell in self._get_undeleted_cells()])
+
+    def _subtract_value_from_undeleted_cells(self, value):
+        for cell in self._get_undeleted_cells():
+            self.matrix[cell[0]][cell[1]] -= value
