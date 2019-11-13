@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from optimal_mapping.mapping import Mapping
+from optimal_mapping.analyzer import RouteAnalyzer
 
 
 @pytest.fixture
@@ -17,14 +17,14 @@ def matrix():
 def test_total_zero_values():
     matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
 
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
 
     assert mapping.total_zero_values == 7
 
 
 def test_rows_reductions(matrix):
     expected_result = np.array([[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._rows_reductions()
 
     assert np.array_equal(mapping.matrix, expected_result)
@@ -32,7 +32,7 @@ def test_rows_reductions(matrix):
 
 def test_columns_subtraction(matrix):
     expected_result = np.array([[8, 7, 12, 9], [15, 13, 15, 16], [8, 12, 9, 8], [0, 0, 0, 0]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._columns_reductions()
 
     assert np.array_equal(mapping.matrix, expected_result)
@@ -40,7 +40,7 @@ def test_columns_subtraction(matrix):
 
 def test_rows_scanning_doesnt_add_vertical_lines_if_zero_is_not_found():
     matrix = np.array([[2, 4], [1, 9]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._rows_scanning()
 
     assert mapping._vertical_lines == []
@@ -48,7 +48,7 @@ def test_rows_scanning_doesnt_add_vertical_lines_if_zero_is_not_found():
 
 def test_rows_scanning_doesnt_add_vertical_lines_if_finds_more_than_one_zero():
     matrix = np.array([[2, 0, 4, 0, 1], [0, 1, 9, 0, 0]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._rows_scanning()
 
     assert mapping._vertical_lines == []
@@ -56,7 +56,7 @@ def test_rows_scanning_doesnt_add_vertical_lines_if_finds_more_than_one_zero():
 
 def test_rows_scanning():
     matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._rows_scanning()
 
     assert mapping._chosen_zeros == [(0, 4), (1, 0), (3, 1)]
@@ -66,7 +66,7 @@ def test_rows_scanning():
 
 def test_columns_scanning_doesnt_cadd_horizontal_lines_if_zero_is_not_found():
     matrix = np.array([[2, 4], [1, 9]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._columns_scanning()
 
     assert mapping._horizontal_lines == []
@@ -74,7 +74,7 @@ def test_columns_scanning_doesnt_cadd_horizontal_lines_if_zero_is_not_found():
 
 def test_columns_scanning_doesnt_add_horizontal_lines_if_finds_more_than_one_zero():
     matrix = np.array([[2, 4, 0, 1], [1, 9, 5, 0], [7, 1, 0, 0], [2, 1, 9, 0]])
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._columns_scanning()
 
     assert mapping._horizontal_lines == []
@@ -89,7 +89,7 @@ def test_columns_scanning():
         [0, 5, 7, 1, 7]
     ])
 
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._columns_scanning()
 
     assert mapping._chosen_zeros == [(3, 1), (2, 2), (0, 4)]
@@ -109,7 +109,7 @@ def test_matrix_scanning():
         ]
     )
 
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping.matrix_scanning()
 
     assert mapping._chosen_zeros == [(0, 4), (1, 0), (3, 1), (2, 2)]
@@ -128,7 +128,7 @@ def test_matrix_scanning_does_more_than_one_loop():
         ]
     )
 
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping.matrix_scanning()
 
     assert mapping._chosen_zeros == [(3, 2),  (2, 3), (1, 1), (0, 0)]
@@ -138,7 +138,7 @@ def test_matrix_scanning_does_more_than_one_loop():
 
 
 def test_reset_scanning_values(matrix):
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._chosen_zeros = [1,2,3]
     mapping._vertical_lines = [1,2,3]
     mapping._horizontal_lines = [1,2,3]
@@ -161,21 +161,22 @@ def test_matrix_reduction(matrix):
             [1, 2, 0, 1]
         ]
     )
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping.matrix_reduction()
 
     assert np.array_equal(mapping.matrix, expected_matrix)
 
 
-def test_generate_intersection_points(matrix):
-    mapping = Mapping(matrix)
+def test_get_intersection_points(matrix):
+    mapping = RouteAnalyzer(matrix)
     mapping._vertical_lines = {0, 1, 4}
     mapping._horizontal_lines = {2}
+    result = [x for x in mapping._get_intersection_points()]
 
-    assert mapping._intersection_points == {(2, 0), (2, 1), (2, 4)}
+    assert result == [(2, 0), (2, 1), (2, 4)]
 
 
-def test_sum_value_at_intersection_points():
+def test_sum_value_at_intersection_points_cells():
     matrix = np.array(
         [
             [2, 4, 7, 2, 0],
@@ -195,10 +196,10 @@ def test_sum_value_at_intersection_points():
         ]
     )
 
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._vertical_lines = {0, 1, 4}
     mapping._horizontal_lines = {2}
-    mapping._sum_value_at_intersection_points(1)
+    mapping._sum_value_at_intersection_points_cells(1)
 
     assert np.array_equal(mapping.matrix, expected_matrix)
 
@@ -213,10 +214,10 @@ def test_get_undeleted_cells():
             [0, 5, 7, 1, 7]
         ]
     )
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._vertical_lines = {0, 1, 4}
     mapping._horizontal_lines = {2}
-    result = mapping._get_undeleted_cells()
+    result = [x for x in mapping._get_undeleted_cells()]
 
     assert result == [(0, 2), (0, 3), (1, 2), (1, 3), (3, 2), (3, 3), (4, 2), (4, 3)]
 
@@ -231,7 +232,7 @@ def test_get_min_value_from_undeleted_cells():
             [0, 5, 7, 1, 7]
         ]
     )
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._vertical_lines = {0, 1, 4}
     mapping._horizontal_lines = {2}
     result = mapping._get_min_value_from_undeleted_cells()
@@ -258,7 +259,7 @@ def test_subtract_value_from_undeleted_cells():
             [0, 5, 6, 0, 7]
         ]
     )
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     mapping._vertical_lines = {0, 1, 4}
     mapping._horizontal_lines = {2}
     mapping._subtract_value_from_undeleted_cells(1)
@@ -267,7 +268,7 @@ def test_subtract_value_from_undeleted_cells():
 
 
 def test_run_with_simple_case(matrix):
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     result = mapping.run()
 
     assert result == [(3, 2),  (2, 3), (1, 1), (0, 0)]
@@ -283,7 +284,7 @@ def test_run_with_complex_test_case():
             [7, 12, 14, 10, 14],
         ]
     )
-    mapping = Mapping(matrix)
+    mapping = RouteAnalyzer(matrix)
     result = mapping.run()
 
     assert result == [(0, 4), (1, 0), (4, 3), (3, 1), (2, 2)]
