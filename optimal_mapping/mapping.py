@@ -26,6 +26,8 @@ class Mapping:
             if len(self._chosen_zeros) == self.matrix_size:
                 break
 
+            self.sum_and_subtract_minimum_value_from_selected_cells()
+
         return self._chosen_zeros
 
     def matrix_reduction(self):
@@ -37,9 +39,14 @@ class Mapping:
 
         while len(self._zeros_scratched) != self.total_zero_values:
             self._rows_scanning()
-            if len(self._chosen_zeros) == self.matrix_size:
+            if len(self._zeros_scratched) == self.total_zero_values:
                 break
             self._columns_scanning()
+
+    def sum_and_subtract_minimum_value_from_selected_cells(self):
+        min_value = self._get_min_value_from_undeleted_cells()
+        self._sum_value_at_intersection_points(min_value)
+        self._subtract_value_from_undeleted_cells(min_value)
 
     def _rows_reductions(self):
         for row in self.matrix:
@@ -99,6 +106,7 @@ class Mapping:
     # b) subtract the minimum undeleted cell value from all the undeleted cell values
     # c) All other entries remain the same
     # Step 4: Start phase 2 again
+
 
     @property
     def _intersection_points(self):

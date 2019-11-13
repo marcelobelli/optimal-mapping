@@ -167,13 +167,6 @@ def test_matrix_reduction(matrix):
     assert np.array_equal(mapping.matrix, expected_matrix)
 
 
-def test_run_with_simple_case(matrix):
-    mapping = Mapping(matrix)
-    result = mapping.run()
-
-    assert result == [(3, 2),  (2, 3), (1, 1), (0, 0)]
-
-
 def test_generate_intersection_points(matrix):
     mapping = Mapping(matrix)
     mapping._vertical_lines = {0, 1, 4}
@@ -271,3 +264,26 @@ def test_subtract_value_from_undeleted_cells():
     mapping._subtract_value_from_undeleted_cells(1)
 
     assert np.array_equal(mapping.matrix, expected_matrix)
+
+
+def test_run_with_simple_case(matrix):
+    mapping = Mapping(matrix)
+    result = mapping.run()
+
+    assert result == [(3, 2),  (2, 3), (1, 1), (0, 0)]
+
+
+def test_run_with_complex_test_case():
+    matrix = np.array(
+        [
+            [9, 11, 14, 11, 7],
+            [6, 15, 13, 13, 10],
+            [12, 13, 6, 8, 8],
+            [11, 9, 10, 12, 9],
+            [7, 12, 14, 10, 14],
+        ]
+    )
+    mapping = Mapping(matrix)
+    result = mapping.run()
+
+    assert result == [(0, 4), (1, 0), (4, 3), (3, 1), (2, 2)]
