@@ -4,7 +4,7 @@ import numpy as np
 
 class RouteAnalyzer:
     def __init__(self, matrix):
-        self.matrix = np.array(matrix)
+        self.matrix = self.get_stabilized_matrix(matrix)
         self.matrix_size = len(self.matrix)
         self._chosen_zeros = list()
         self._vertical_lines = list()
@@ -14,6 +14,23 @@ class RouteAnalyzer:
     @property
     def total_zero_values(self):
         return self.matrix_size ** 2 - np.count_nonzero(self.matrix)
+
+    def get_stabilized_matrix(self, matrix):
+        matrix = np.array(matrix)
+        rows = len(matrix)
+        columns = len(matrix.transpose())
+
+        if rows == columns:
+            return matrix
+
+        if rows < columns:
+            rows_to_stabilize = columns - rows
+            rows_to_add = np.zeros((rows_to_stabilize, columns))
+            return np.row_stack((matrix, rows_to_add))
+
+        columns_to_stabilize = rows - columns
+        columns_to_add = np.zeros((rows, columns_to_stabilize))
+        return np.column_stack((matrix, columns_to_add))
 
     def run(self):
         self.matrix_reduction()
