@@ -27,7 +27,7 @@ def test_rows_reductions(matrix):
     analyzer = RouteAnalyzer(matrix)
     analyzer._rows_reductions()
 
-    assert np.array_equal(analyzer.matrix, expected_result)
+    assert np.array_equal(analyzer._matrix, expected_result)
 
 
 def test_columns_subtraction(matrix):
@@ -35,7 +35,7 @@ def test_columns_subtraction(matrix):
     analyzer = RouteAnalyzer(matrix)
     analyzer._columns_reductions()
 
-    assert np.array_equal(analyzer.matrix, expected_result)
+    assert np.array_equal(analyzer._matrix, expected_result)
 
 
 def test_rows_scanning_doesnt_add_vertical_lines_if_zero_is_not_found():
@@ -59,7 +59,7 @@ def test_rows_scanning():
     analyzer = RouteAnalyzer(matrix)
     analyzer._rows_scanning()
 
-    assert analyzer._chosen_zeros == [(0, 4), (1, 0), (3, 1)]
+    assert analyzer._chosen_cells == [(0, 4), (1, 0), (3, 1)]
     assert sorted(analyzer._vertical_lines) == [0, 1, 4]
     assert analyzer._zeros_scratched == {(0, 4), (3, 4), (1, 0), (4, 0), (3, 1)}
 
@@ -92,7 +92,7 @@ def test_columns_scanning():
     analyzer = RouteAnalyzer(matrix)
     analyzer._columns_scanning()
 
-    assert analyzer._chosen_zeros == [(3, 1), (2, 2), (0, 4)]
+    assert analyzer._chosen_cells == [(3, 1), (2, 2), (0, 4)]
     assert sorted(analyzer._horizontal_lines) == [0, 2, 3]
     assert analyzer._zeros_scratched == {(3, 1), (3, 4), (2, 2), (2, 3), (0, 4)}
 
@@ -112,7 +112,7 @@ def test_matrix_scanning():
     analyzer = RouteAnalyzer(matrix)
     analyzer.matrix_scanning()
 
-    assert analyzer._chosen_zeros == [(0, 4), (1, 0), (3, 1), (2, 2)]
+    assert analyzer._chosen_cells == [(0, 4), (1, 0), (3, 1), (2, 2)]
     assert sorted(analyzer._vertical_lines) == [0, 1, 4]
     assert sorted(analyzer._horizontal_lines) == [2]
     assert analyzer._zeros_scratched == {(0, 4), (1, 0), (2, 2), (2, 3), (3, 1), (3, 4), (4, 0)}
@@ -131,7 +131,7 @@ def test_matrix_scanning_does_more_than_one_loop():
     analyzer = RouteAnalyzer(matrix)
     analyzer.matrix_scanning()
 
-    assert analyzer._chosen_zeros == [(3, 2),  (2, 3), (1, 1), (0, 0)]
+    assert analyzer._chosen_cells == [(3, 2), (2, 3), (1, 1), (0, 0)]
     assert sorted(analyzer._vertical_lines) == [1, 2]
     assert sorted(analyzer._horizontal_lines) == [0, 2]
     assert analyzer._zeros_scratched == {(3, 2),  (2, 3), (1, 1), (0, 0), (2, 2), (2, 0), (1, 2), (0, 1)}
@@ -139,14 +139,14 @@ def test_matrix_scanning_does_more_than_one_loop():
 
 def test_reset_scanning_values(matrix):
     analyzer = RouteAnalyzer(matrix)
-    analyzer._chosen_zeros = [1,2,3]
+    analyzer._chosen_cells = [1, 2, 3]
     analyzer._vertical_lines = [1,2,3]
     analyzer._horizontal_lines = [1,2,3]
     analyzer._zeros_scratched = {1,2,3}
 
     analyzer._reset_scanning_values()
 
-    assert analyzer._chosen_zeros == list()
+    assert analyzer._chosen_cells == list()
     assert analyzer._vertical_lines == list()
     assert analyzer._horizontal_lines == list()
     assert analyzer._zeros_scratched == set()
@@ -164,7 +164,7 @@ def test_matrix_reduction(matrix):
     analyzer = RouteAnalyzer(matrix)
     analyzer.matrix_reduction()
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_get_intersection_points(matrix):
@@ -201,7 +201,7 @@ def test_sum_value_at_intersection_points_cells():
     analyzer._horizontal_lines = {2}
     analyzer._sum_value_at_intersection_points_cells(1)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_get_undeleted_cells():
@@ -264,7 +264,7 @@ def test_subtract_value_from_undeleted_cells():
     analyzer._horizontal_lines = {2}
     analyzer._subtract_value_from_undeleted_cells(1)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_run_with_simple_matrix(matrix):
@@ -340,7 +340,7 @@ def test_get_stabilized_matrix_with_one_missing_row():
     )
     analyzer = RouteAnalyzer(matrix)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_get_stabilized_matrix_with_two_missing_rows():
@@ -362,7 +362,7 @@ def test_get_stabilized_matrix_with_two_missing_rows():
     )
     analyzer = RouteAnalyzer(matrix)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_get_stabilized_matrix_with_one_missing_column():
@@ -386,7 +386,7 @@ def test_get_stabilized_matrix_with_one_missing_column():
     )
     analyzer = RouteAnalyzer(matrix)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_get_stabilized_matrix_with_two_missing_columns():
@@ -410,7 +410,7 @@ def test_get_stabilized_matrix_with_two_missing_columns():
     )
     analyzer = RouteAnalyzer(matrix)
 
-    assert np.array_equal(analyzer.matrix, expected_matrix)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_random_scanning():
@@ -425,7 +425,17 @@ def test_random_scanning():
     analyzer = RouteAnalyzer(matrix)
     analyzer._random_scanning()
 
-    assert analyzer._chosen_zeros == [(0, 1)]
+    assert analyzer._chosen_cells == [(0, 1)]
     assert analyzer._vertical_lines == [1]
     assert analyzer._horizontal_lines == [0]
     assert analyzer._zeros_scratched == {(0, 1), (2, 1), (0, 2)}
+
+
+# TODO  Rename everything
+def test_with_loadsmart_matrix(loadsmart_matrix):
+    matrix = np.array(loadsmart_matrix)
+
+    analyzer = RouteAnalyzer(matrix)
+    result = analyzer.run()
+
+    assert result == [(8, 0), (24, 1), (27, 2), (43, 3), (16, 4), (20, 5), (42, 6)]
