@@ -2,64 +2,67 @@
 import numpy as np
 
 
+#  TODO  Refatorar essa porra: https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html
 class RouteAnalyzer:
     def __init__(self, matrix):
+        self._matrix = np.array(matrix)
+        self._original_matrix_shape = self._matrix.shape
 
-        self._original_matrix = np.array(matrix)
-        self._matrix = self.get_stabilized_matrix(self._original_matrix)
-        self._matrix_side = len(self._matrix)
-
-        ##############################################
-        #  Refatorar essa porra: https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html
-        # Usar o .shape
-
-        self._original_matrix_dimension = (len(matrix), len(matrix[0]))
         self._chosen_cells = list()
         self._vertical_lines = list()
         self._horizontal_lines = list()
         self._zeros_scratched = set()
 
     @property
-    def total_zero_values(self):
-        return self._matrix_side ** 2 - np.count_nonzero(self._matrix)
-
-    def get_stabilized_matrix(self, matrix):
-        rows, columns = matrix.shape
-
-        if rows == columns:
-            return matrix
-
-        if rows < columns:
-            diff_between_rows_and_columns = columns - rows
-            rows_to_add = np.zeros((diff_between_rows_and_columns, columns))
-            return np.row_stack((matrix, rows_to_add))
-
-        diff_between_columns_and_rows = rows - columns
-        columns_to_add = np.zeros((rows, diff_between_columns_and_rows))
-        return np.column_stack((matrix, columns_to_add))
+    def _total_zero_values(self):
+        return self._matrix.size - np.count_nonzero(self._matrix)
 
     def run(self):
+        self._balance_matrix()
         self.matrix_reduction()
 
         while True:
             self.matrix_scanning()
 
-            if len(self._chosen_cells) == self._matrix_side:
+            if len(self._chosen_cells) == self._matrix.shape[0]:
                 break
 
             self.sum_and_subtract_minimum_value_from_selected_cells()
 
         self._clean_chosen_cells()
+
         return self._chosen_cells
 
+    def _balance_matrix(self):
+        rows, columns = self._original_matrix_shape
+
+        if rows == columns:
+            return
+
+        self._matrix = (
+            self._get_matrix_with_dummy_rows() if rows < columns else self._get_matrix_with_dummy_columns()
+        )
+
+    def _get_matrix_with_dummy_rows(self):
+        rows, columns = self._original_matrix_shape
+        diff_between_rows_and_columns = columns - rows
+        rows_to_add = np.zeros((diff_between_rows_and_columns, columns))
+        return np.row_stack((self._matrix, rows_to_add))
+
+    def _get_matrix_with_dummy_columns(self):
+        rows, columns = self._original_matrix_shape
+        diff_between_columns_and_rows = rows - columns
+        columns_to_add = np.zeros((rows, diff_between_columns_and_rows))
+        return np.column_stack((self._matrix, columns_to_add))
+
     def _clean_chosen_cells(self):
-        if len(set(self._original_matrix_dimension)) == 1:
+        if len(set(self._original_matrix_shape)) == 1:
             return
 
         self._chosen_cells = [
             cell
             for cell in self._chosen_cells
-            if cell[0] < self._original_matrix_dimension[0] and cell[1] < self._original_matrix_dimension[1]
+            if cell[0] < self._original_matrix_shape[0] and cell[1] < self._original_matrix_shape[1]
         ]
 
     def matrix_reduction(self):
@@ -69,9 +72,9 @@ class RouteAnalyzer:
     def matrix_scanning(self):
         self._reset_scanning_values()
 
-        while len(self._zeros_scratched) != self.total_zero_values:
+        while len(self._zeros_scratched) != self._total_zero_values:
             row_scanning_successful = self._rows_scanning()
-            if len(self._zeros_scratched) == self.total_zero_values:
+            if len(self._zeros_scratched) == self._total_zero_values:
                 break
             column_scanning_successful = self._columns_scanning()
 
@@ -86,13 +89,13 @@ class RouteAnalyzer:
     def _rows_reductions(self):
         for row in self._matrix:
             min_value = min(row)
-            for i in range(self._matrix_side):
+            for i in range(self._matrix.shape[0]):
                 row[i] -= min_value
 
     def _columns_reductions(self):
         for column in self._matrix.transpose():
             min_value = min(column)
-            for i in range(self._matrix_side):
+            for i in range(self._matrix.shape[1]):
                 column[i] -= min_value
 
     def _reset_scanning_values(self):
@@ -164,8 +167,10 @@ class RouteAnalyzer:
             self._matrix[cell[0]][cell[1]] -= value
 
     def _get_undeleted_cells(self):
-        clear_rows = [row for row in range(self._matrix_side) if row not in self._horizontal_lines]
-        clear_columns = [column for column in range(self._matrix_side) if column not in self._vertical_lines]
+        clear_rows = [row for row in range(self._matrix.shape[0]) if row not in self._horizontal_lines]
+        clear_columns = [
+            column for column in range(self._matrix.shape[1]) if column not in self._vertical_lines
+        ]
         return ((x, y) for x in clear_rows for y in clear_columns)
 
     def _random_scanning(self):
