@@ -17,9 +17,10 @@ class RouteAnalyzer:
     def _total_zero_values(self):
         return self._matrix.size - np.count_nonzero(self._matrix)
 
+    # TODO Melhorar o nome desse cara
     def run(self):
         self._balance_matrix()
-        self.matrix_reduction()
+        self._matrix_reduction()
 
         while True:
             self.matrix_scanning()
@@ -55,6 +56,16 @@ class RouteAnalyzer:
         columns_to_add = np.zeros((rows, diff_between_columns_and_rows))
         return np.column_stack((self._matrix, columns_to_add))
 
+    def _matrix_reduction(self):
+        self._make_reductions(self._matrix)
+        self._make_reductions(self._matrix.transpose())
+
+    def _make_reductions(self, matrix):
+        for values in matrix:
+            min_value = min(values)
+            for i in range(self._matrix.shape[0]):
+                values[i] -= min_value
+
     def _clean_chosen_cells(self):
         if len(set(self._original_matrix_shape)) == 1:
             return
@@ -64,10 +75,6 @@ class RouteAnalyzer:
             for cell in self._chosen_cells
             if cell[0] < self._original_matrix_shape[0] and cell[1] < self._original_matrix_shape[1]
         ]
-
-    def matrix_reduction(self):
-        self._rows_reductions()
-        self._columns_reductions()
 
     def matrix_scanning(self):
         self._reset_scanning_values()
@@ -85,18 +92,6 @@ class RouteAnalyzer:
         min_value = self._get_min_value_from_undeleted_cells()
         self._sum_value_at_intersection_points_cells(min_value)
         self._subtract_value_from_undeleted_cells(min_value)
-
-    def _rows_reductions(self):
-        for row in self._matrix:
-            min_value = min(row)
-            for i in range(self._matrix.shape[0]):
-                row[i] -= min_value
-
-    def _columns_reductions(self):
-        for column in self._matrix.transpose():
-            min_value = min(column)
-            for i in range(self._matrix.shape[1]):
-                column[i] -= min_value
 
     def _reset_scanning_values(self):
         self._chosen_cells = list()

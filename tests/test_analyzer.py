@@ -4,16 +4,6 @@ import pytest
 from optimal_mapping.analyzer import RouteAnalyzer
 
 
-@pytest.fixture
-def matrix():
-    return [
-        [14, 12, 15, 15],
-        [21, 18, 18, 22],
-        [14, 17, 12, 14],
-        [6, 5, 3, 6],
-    ]
-
-
 @pytest.mark.parametrize(
     "matrix, expected_result",
     (
@@ -70,20 +60,20 @@ def test_balance_matrix(original_matrix, expected_matrix):
     assert np.array_equal(analyzer._matrix, np.array(expected_matrix))
 
 
-def test_rows_reductions(matrix):
+def test_make_reductions(simple_matrix):
     expected_result = np.array([[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer._rows_reductions()
+    analyzer = RouteAnalyzer(simple_matrix)
+    analyzer._make_reductions(analyzer._matrix)
 
     assert np.array_equal(analyzer._matrix, expected_result)
 
 
-def test_columns_subtraction(matrix):
-    expected_result = np.array([[8, 7, 12, 9], [15, 13, 15, 16], [8, 12, 9, 8], [0, 0, 0, 0]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer._columns_reductions()
+def test_matrix_reduction(simple_matrix):
+    expected_matrix = np.array([[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]])
+    analyzer = RouteAnalyzer(simple_matrix)
+    analyzer._matrix_reduction()
 
-    assert np.array_equal(analyzer._matrix, expected_result)
+    assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
 def test_rows_scanning_doesnt_add_vertical_lines_if_zero_is_not_found():
@@ -163,8 +153,8 @@ def test_matrix_scanning_does_more_than_one_loop():
     assert analyzer._zeros_scratched == {(3, 2), (2, 3), (1, 1), (0, 0), (2, 2), (2, 0), (1, 2), (0, 1)}
 
 
-def test_reset_scanning_values(matrix):
-    analyzer = RouteAnalyzer(matrix)
+def test_reset_scanning_values(simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
     analyzer._chosen_cells = [1, 2, 3]
     analyzer._vertical_lines = [1, 2, 3]
     analyzer._horizontal_lines = [1, 2, 3]
@@ -178,16 +168,8 @@ def test_reset_scanning_values(matrix):
     assert analyzer._zeros_scratched == set()
 
 
-def test_matrix_reduction(matrix):
-    expected_matrix = np.array([[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer.matrix_reduction()
-
-    assert np.array_equal(analyzer._matrix, expected_matrix)
-
-
-def test_get_intersection_points(matrix):
-    analyzer = RouteAnalyzer(matrix)
+def test_get_intersection_points(simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
     analyzer._vertical_lines = {0, 1, 4}
     analyzer._horizontal_lines = {2}
     result = [x for x in analyzer._get_intersection_points()]
@@ -242,8 +224,8 @@ def test_subtract_value_from_undeleted_cells():
     assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
-def test_run_with_simple_matrix(matrix):
-    analyzer = RouteAnalyzer(matrix)
+def test_run_with_simple_matrix(simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
     result = analyzer.run()
 
     assert result == [(3, 2), (2, 3), (1, 1), (0, 0)]

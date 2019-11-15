@@ -2,6 +2,18 @@ import pytest
 
 
 @pytest.fixture
+def simple_matrix():
+    return [
+        [14, 12, 15, 15],
+        [21, 18, 18, 22],
+        [14, 17, 12, 14],
+        [6, 5, 3, 6],
+    ]
+
+
+
+
+@pytest.fixture
 def loadsmart_matrix():
     return [
         [
