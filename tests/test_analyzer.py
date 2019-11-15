@@ -267,14 +267,14 @@ def test_subtract_value_from_undeleted_cells():
     assert np.array_equal(analyzer.matrix, expected_matrix)
 
 
-def test_run_with_simple_case(matrix):
+def test_run_with_simple_matrix(matrix):
     analyzer = RouteAnalyzer(matrix)
     result = analyzer.run()
 
     assert result == [(3, 2),  (2, 3), (1, 1), (0, 0)]
 
 
-def test_run_with_complex_test_case():
+def test_run_with_complex_matrix():
     matrix = np.array(
         [
             [9, 11, 14, 11, 7],
@@ -288,6 +288,36 @@ def test_run_with_complex_test_case():
     result = analyzer.run()
 
     assert result == [(0, 4), (1, 0), (4, 3), (3, 1), (2, 2)]
+
+
+def test_run_with_unbalanced_matrix():
+    matrix = np.array(
+        [
+            [9, 12, 11],
+            [8, 13, 17],
+            [20, 12, 13],
+            [21, 15, 17]
+        ]
+    )
+    analyzer = RouteAnalyzer(matrix)
+    result = analyzer.run()
+
+    assert result == [(1, 0), (0, 2), (2, 1)]
+
+
+def test_run_with_multiple_solutions_matrix():
+    matrix = np.array(
+        [
+            [5, 8, 2, 6],
+            [8, 9, 3, 9],
+            [4, 8, 1, 7],
+            [12, 10, 4, 8]
+        ]
+    )
+    analyzer = RouteAnalyzer(matrix)
+    result = analyzer.run()
+
+    assert result == [(0, 0), (2, 2), (3, 3), (1, 1)]
 
 
 def test_get_stabilized_matrix_with_one_missing_row():
@@ -381,3 +411,21 @@ def test_get_stabilized_matrix_with_two_missing_columns():
     analyzer = RouteAnalyzer(matrix)
 
     assert np.array_equal(analyzer.matrix, expected_matrix)
+
+
+def test_random_scanning():
+    matrix = np.array(
+        [
+            [2, 0, 0, 2],
+            [4, 6, 0, 0],
+            [2, 0, 2, 0],
+            [0, 2, 3, 0]
+        ]
+    )
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._random_scanning()
+
+    assert analyzer._chosen_zeros == [(0, 1)]
+    assert analyzer._vertical_lines == [1]
+    assert analyzer._horizontal_lines == [0]
+    assert analyzer._zeros_scratched == {(0, 1), (2, 1), (0, 2)}
