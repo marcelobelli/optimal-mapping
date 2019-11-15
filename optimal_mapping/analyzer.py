@@ -1,6 +1,8 @@
 # python 3.8.0
 import numpy as np
 
+from time import sleep
+
 
 class RouteAnalyzer:
     def __init__(self, matrix):
@@ -57,15 +59,23 @@ class RouteAnalyzer:
             self.sum_and_subtract_minimum_value_from_selected_cells()
 
         self._clean_chosen_zeros()
+        # print("###############################################")
+        # print(self._original_matrix_dimension)
         return self._chosen_zeros
 
     def _clean_chosen_zeros(self):
         if len(set(self._original_matrix_dimension)) == 1:
             return
-        for cell in self._chosen_zeros:
-            if cell[0] in range(self._original_matrix_dimension[0]) and cell[1] in range(self._original_matrix_dimension[1]):
-                continue
-            self._chosen_zeros.remove(cell)
+
+        self._chosen_zeros = [cell for cell in self._chosen_zeros if cell[0] < self._original_matrix_dimension[0] and cell[1] < self._original_matrix_dimension[1]]
+
+
+        # for cell in self._chosen_zeros:
+        #     if cell[0] < self._original_matrix_dimension[0] and cell[1] < self._original_matrix_dimension[1]:
+        #         print(f"CELL: {cell[0]} < {self._original_matrix_dimension[0]} and {cell[1]} < {self._original_matrix_dimension[1]}")
+        #         sleep(3)
+        #         continue
+        #     self._chosen_zeros.remove(cell)
 
     def matrix_reduction(self):
         self._rows_reductions()
