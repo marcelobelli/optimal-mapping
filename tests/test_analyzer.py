@@ -133,7 +133,7 @@ def test_matrix_scanning():
     matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
 
     analyzer = RouteAnalyzer(matrix)
-    analyzer.matrix_scanning()
+    analyzer._matrix_scanning()
 
     assert analyzer._chosen_cells == [(0, 4), (1, 0), (3, 1), (2, 2)]
     assert sorted(analyzer._vertical_lines) == [0, 1, 4]
@@ -145,7 +145,7 @@ def test_matrix_scanning_does_more_than_one_loop():
     matrix = np.array([[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]])
 
     analyzer = RouteAnalyzer(matrix)
-    analyzer.matrix_scanning()
+    analyzer._matrix_scanning()
 
     assert analyzer._chosen_cells == [(3, 2), (2, 3), (1, 1), (0, 0)]
     assert sorted(analyzer._vertical_lines) == [1, 2]
@@ -276,3 +276,13 @@ def test_with_loadsmart_matrix(loadsmart_matrix):
     result = analyzer.run()
 
     assert result == [(8, 0), (24, 1), (27, 2), (43, 3), (16, 4), (20, 5), (42, 6)]
+
+
+@pytest.mark.parametrize(
+    "cell, result",
+    (((0, 0), True), ((1, 2), True), ((3, 3), True), ((4, 1), False), ((4, 4), False), ((5, 5), False)),
+)
+def test_is_a_valid_cell(cell, result, simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
+
+    assert analyzer._is_a_valid_cell(cell) is result

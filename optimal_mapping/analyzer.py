@@ -23,16 +23,14 @@ class RouteAnalyzer:
         self._matrix_reduction()
 
         while True:
-            self.matrix_scanning()
+            self._matrix_scanning()
 
             if len(self._chosen_cells) == self._matrix.shape[0]:
                 break
 
             self.sum_and_subtract_minimum_value_from_selected_cells()
 
-        self._clean_chosen_cells()
-
-        return self._chosen_cells
+        return self._get_results()
 
     def _balance_matrix(self):
         rows, columns = self._original_matrix_shape
@@ -66,17 +64,7 @@ class RouteAnalyzer:
             for i in range(self._matrix.shape[0]):
                 values[i] -= min_value
 
-    def _clean_chosen_cells(self):
-        if len(set(self._original_matrix_shape)) == 1:
-            return
-
-        self._chosen_cells = [
-            cell
-            for cell in self._chosen_cells
-            if cell[0] < self._original_matrix_shape[0] and cell[1] < self._original_matrix_shape[1]
-        ]
-
-    def matrix_scanning(self):
+    def _matrix_scanning(self):
         self._reset_scanning_values()
 
         while len(self._zeros_scratched) != self._total_zero_values:
@@ -87,11 +75,6 @@ class RouteAnalyzer:
 
             if not row_scanning_successful or not column_scanning_successful:
                 self._random_scanning()
-
-    def sum_and_subtract_minimum_value_from_selected_cells(self):
-        min_value = self._get_min_value_from_undeleted_cells()
-        self._sum_value_at_intersection_points_cells(min_value)
-        self._subtract_value_from_undeleted_cells(min_value)
 
     def _reset_scanning_values(self):
         self._chosen_cells = list()
@@ -146,6 +129,23 @@ class RouteAnalyzer:
             self._zeros_scratched |= {(horizontal_line, y) for y in zeros_from_row}
 
         return scanning_result
+
+    def _get_results(self):
+        if len(set(self._original_matrix_shape)) == 1:
+            return self._chosen_cells
+
+        return [cell for cell in self._chosen_cells if self._is_a_valid_cell(cell)]
+
+    def _is_a_valid_cell(self, cell):
+        cell_row, cell_collumn = cell
+        rows, columns = self._original_matrix_shape
+
+        return cell_row < rows and cell_collumn < columns
+
+    def sum_and_subtract_minimum_value_from_selected_cells(self):
+        min_value = self._get_min_value_from_undeleted_cells()
+        self._sum_value_at_intersection_points_cells(min_value)
+        self._subtract_value_from_undeleted_cells(min_value)
 
     def _get_min_value_from_undeleted_cells(self):
         return min([self._matrix[cell[0]][cell[1]] for cell in self._get_undeleted_cells()])

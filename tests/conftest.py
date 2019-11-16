@@ -11,8 +11,6 @@ def simple_matrix():
     ]
 
 
-
-
 @pytest.fixture
 def loadsmart_matrix():
     return [
