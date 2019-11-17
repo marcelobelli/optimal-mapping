@@ -1,3 +1,4 @@
+# python 3.8.0
 import numpy as np
 import pytest
 
@@ -61,7 +62,7 @@ def test_balance_matrix(original_matrix, expected_matrix):
 
 
 def test_make_reductions(simple_matrix):
-    expected_result = np.array([[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]])
+    expected_result = [[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]]
     analyzer = RouteAnalyzer(simple_matrix)
     analyzer._make_reductions(analyzer._matrix)
 
@@ -69,7 +70,7 @@ def test_make_reductions(simple_matrix):
 
 
 def test_matrix_reduction(simple_matrix):
-    expected_matrix = np.array([[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]])
+    expected_matrix = [[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]]
     analyzer = RouteAnalyzer(simple_matrix)
     analyzer._matrix_reduction()
 
@@ -77,7 +78,7 @@ def test_matrix_reduction(simple_matrix):
 
 
 def test_rows_scanning_when_zero_is_not_found():
-    matrix = np.array([[2, 4], [1, 9]])
+    matrix = [[2, 4], [1, 9]]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._rows_scanning()
 
@@ -88,7 +89,7 @@ def test_rows_scanning_when_zero_is_not_found():
 
 
 def test_rows_scanning_when_finds_more_than_one_zero():
-    matrix = np.array([[2, 0, 4, 0, 1], [0, 1, 9, 0, 0]])
+    matrix = [[2, 0, 4, 0, 1], [0, 1, 9, 0, 0]]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._rows_scanning()
 
@@ -99,7 +100,7 @@ def test_rows_scanning_when_finds_more_than_one_zero():
 
 
 def test_rows_scanning():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._rows_scanning()
 
@@ -110,7 +111,7 @@ def test_rows_scanning():
 
 
 def test_columns_scanning_when_zero_is_not_found():
-    matrix = np.array([[2, 4], [1, 9]])
+    matrix = [[2, 4], [1, 9]]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._columns_scanning()
 
@@ -121,7 +122,7 @@ def test_columns_scanning_when_zero_is_not_found():
 
 
 def test_columns_scanning_when_finds_more_than_one_zero():
-    matrix = np.array([[2, 4, 0, 1], [1, 9, 5, 0], [7, 1, 0, 0], [2, 1, 9, 0]])
+    matrix = [[2, 4, 0, 1], [1, 9, 5, 0], [7, 1, 0, 0], [2, 1, 9, 0]]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._columns_scanning()
 
@@ -132,7 +133,7 @@ def test_columns_scanning_when_finds_more_than_one_zero():
 
 
 def test_columns_scanning():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
 
     analyzer = RouteAnalyzer(matrix)
     result = analyzer._columns_scanning()
@@ -170,7 +171,7 @@ def test_reset_scanning_values(simple_matrix):
 
 
 def test_matrix_scanning():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
 
     analyzer = RouteAnalyzer(matrix)
     analyzer._matrix_scanning()
@@ -182,7 +183,7 @@ def test_matrix_scanning():
 
 
 def test_matrix_scanning_does_more_than_one_loop():
-    matrix = np.array([[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]])
+    matrix = [[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]]
 
     analyzer = RouteAnalyzer(matrix)
     analyzer._matrix_scanning()
@@ -194,10 +195,7 @@ def test_matrix_scanning_does_more_than_one_loop():
 
 
 def test_matrix_scanning_with_multiple_solutions():
-    matrix = np.array([[0, 0, 0, 0],
-                       [5, 0, 0, 2],
-                       [0, 1, 0, 2],
-                       [8, 0, 0, 0]])
+    matrix = [[0, 0, 0, 0], [5, 0, 0, 2], [0, 1, 0, 2], [8, 0, 0, 0]]
 
     analyzer = RouteAnalyzer(matrix)
     analyzer._matrix_scanning()
@@ -205,7 +203,39 @@ def test_matrix_scanning_with_multiple_solutions():
     assert analyzer._chosen_cells == [(0, 0), (2, 2), (3, 3), (1, 1)]
     assert sorted(analyzer._vertical_lines) == [0, 1, 2]
     assert sorted(analyzer._horizontal_lines) == [0, 3]
-    assert analyzer._zeros_scratched == {(3, 1), (3, 2), (3, 3), (0, 1), (1, 1), (1, 2), (0, 2), (2, 2), (2, 0), (0, 0), (0, 3)}
+    assert analyzer._zeros_scratched == {
+        (3, 1),
+        (3, 2),
+        (3, 3),
+        (0, 1),
+        (1, 1),
+        (1, 2),
+        (0, 2),
+        (2, 2),
+        (2, 0),
+        (0, 0),
+        (0, 3),
+    }
+
+
+def test_get_undeleted_cells():
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._vertical_lines = {0, 1, 4}
+    analyzer._horizontal_lines = {2}
+    result = [x for x in analyzer._get_undeleted_cells()]
+
+    assert result == [(0, 2), (0, 3), (1, 2), (1, 3), (3, 2), (3, 3), (4, 2), (4, 3)]
+
+
+def test_get_min_value_from_undeleted_cells():
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._vertical_lines = {0, 1, 4}
+    analyzer._horizontal_lines = {2}
+    result = analyzer._get_min_value_from_undeleted_cells()
+
+    assert result == 1
 
 
 def test_get_intersection_points(simple_matrix):
@@ -218,7 +248,7 @@ def test_get_intersection_points(simple_matrix):
 
 
 def test_sum_value_at_intersection_points_cells():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
     expected_matrix = np.array(
         [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [7, 8, 0, 0, 3], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
     )
@@ -231,28 +261,8 @@ def test_sum_value_at_intersection_points_cells():
     assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
-def test_get_undeleted_cells():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer._vertical_lines = {0, 1, 4}
-    analyzer._horizontal_lines = {2}
-    result = [x for x in analyzer._get_undeleted_cells()]
-
-    assert result == [(0, 2), (0, 3), (1, 2), (1, 3), (3, 2), (3, 3), (4, 2), (4, 3)]
-
-
-def test_get_min_value_from_undeleted_cells():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer._vertical_lines = {0, 1, 4}
-    analyzer._horizontal_lines = {2}
-    result = analyzer._get_min_value_from_undeleted_cells()
-
-    assert result == 1
-
-
 def test_subtract_value_from_undeleted_cells():
-    matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
     expected_matrix = np.array(
         [[2, 4, 6, 1, 0], [0, 9, 6, 4, 4], [6, 7, 0, 0, 2], [2, 0, 0, 0, 0], [0, 5, 6, 0, 7]]
     )
@@ -262,6 +272,44 @@ def test_subtract_value_from_undeleted_cells():
     analyzer._subtract_value_from_undeleted_cells(1)
 
     assert np.array_equal(analyzer._matrix, expected_matrix)
+
+
+def test_sum_and_subtract_minimum_value_from_selected_cells():
+    matrix = [[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]]
+    expected_matrix = np.array(
+        [[2, 4, 6, 1, 0], [0, 9, 6, 4, 4], [7, 8, 0, 0, 3], [2, 0, 0, 0, 0], [0, 5, 6, 0, 7]]
+    )
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._vertical_lines = {0, 1, 4}
+    analyzer._horizontal_lines = {2}
+    analyzer._sum_and_subtract_minimum_value_from_selected_cells()
+
+    assert np.array_equal(analyzer._matrix, expected_matrix)
+
+
+@pytest.mark.parametrize(
+    "cell, result",
+    (((0, 0), True), ((1, 2), True), ((3, 3), True), ((4, 1), False), ((4, 4), False), ((5, 5), False)),
+)
+def test_is_a_valid_cell(cell, result, simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
+
+    assert analyzer._is_a_valid_cell(cell) is result
+
+
+@pytest.mark.parametrize(
+    "shape, chosen_cells, expected_result",
+    (
+        ((4, 4), [(0, 0), (1, 1), (2, 2), (3, 3)], [(0, 0), (1, 1), (2, 2), (3, 3)]),
+        ((4, 3), [(0, 0), (1, 1), (2, 2), (3, 3)], [(0, 0), (1, 1), (2, 2)]),
+    ),
+)
+def test_get_result(shape, chosen_cells, expected_result):
+    matrix = np.zeros(shape)
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._chosen_cells = chosen_cells
+
+    assert analyzer._get_results() == expected_result
 
 
 def test_run_with_simple_matrix(simple_matrix):
@@ -290,12 +338,7 @@ def test_run_with_unbalanced_matrix():
 
 
 def test_run_with_multiple_solutions_matrix():
-    matrix = np.array([
-        [5, 8, 2, 6],
-        [8, 9, 3, 9],
-        [4, 8, 1, 7],
-        [12, 10, 4, 8]
-    ])
+    matrix = np.array([[5, 8, 2, 6], [8, 9, 3, 9], [4, 8, 1, 7], [12, 10, 4, 8]])
     analyzer = RouteAnalyzer(matrix)
     result = analyzer.run()
 
@@ -303,6 +346,8 @@ def test_run_with_multiple_solutions_matrix():
 
 
 # TODO  Rename everything
+
+
 def test_with_loadsmart_matrix(loadsmart_matrix):
     matrix = np.array(loadsmart_matrix)
 
@@ -310,13 +355,3 @@ def test_with_loadsmart_matrix(loadsmart_matrix):
     result = analyzer.run()
 
     assert result == [(8, 0), (24, 1), (27, 2), (43, 3), (16, 4), (20, 5), (42, 6)]
-
-
-@pytest.mark.parametrize(
-    "cell, result",
-    (((0, 0), True), ((1, 2), True), ((3, 3), True), ((4, 1), False), ((4, 4), False), ((5, 5), False)),
-)
-def test_is_a_valid_cell(cell, result, simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
-
-    assert analyzer._is_a_valid_cell(cell) is result

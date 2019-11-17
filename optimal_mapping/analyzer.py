@@ -172,6 +172,12 @@ class RouteAnalyzer:
     def _get_min_value_from_undeleted_cells(self):
         return min([self._matrix[cell[0]][cell[1]] for cell in self._get_undeleted_cells()])
 
+    def _get_undeleted_cells(self):
+        rows, columns = self._matrix.shape
+        clear_rows = [row for row in range(rows) if row not in self._horizontal_lines]
+        clear_columns = [column for column in range(columns) if column not in self._vertical_lines]
+        return ((x, y) for x in clear_rows for y in clear_columns)
+
     def _sum_value_at_intersection_points_cells(self, value):
         for point in self._get_intersection_points():
             self._matrix[point[0]][point[1]] += value
@@ -182,10 +188,3 @@ class RouteAnalyzer:
     def _subtract_value_from_undeleted_cells(self, value):
         for cell in self._get_undeleted_cells():
             self._matrix[cell[0]][cell[1]] -= value
-
-    def _get_undeleted_cells(self):
-        rows, columns = self._matrix.shape
-        clear_rows = [row for row in range(rows) if row not in self._horizontal_lines]
-        clear_columns = [column for column in range(columns) if column not in self._vertical_lines]
-        return ((x, y) for x in clear_rows for y in clear_columns)
-
