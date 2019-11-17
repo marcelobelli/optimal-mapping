@@ -346,3 +346,9 @@ def test_get_combinations_with_complex_matrix(complex_matrix):
     analyzer = RouteAnalyzer(complex_matrix)
     result = analyzer.get_combinations()
     assert result == [(8, 0), (24, 1), (27, 2), (43, 3), (16, 4), (20, 5), (42, 6)]
+
+
+def test_make_routes_combination(cargo_csv, trucks_csv, cargo, trucks):
+    expected_result = {trucks[0]: cargo[0], trucks[1]: cargo[1]}
+    result = RouteAnalyzer.make_routes_combination(cargo_csv, trucks_csv)
+    assert result == expected_result

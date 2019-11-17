@@ -18,13 +18,13 @@ Using a terminal from the project root folder run the command `make deps`. This 
  2) At the project root folder open a python shell. After that execute the commands:
 
 ```
-In [1]: from optimal_mapping import map_best_combinations
+In [1]: from optimal_mapping import get_best_combination
 
 In [2]: cargos_csv = <PATH_TO_CARGOS_CSV>
 
 In [3]: trucks_csv = <PATH_TO_TRUCKS_CSV>
 
-In [4]: map_best_combinations(cargos_csv, trucks_csv)
+In [4]: get_best_combination(cargos_csv, trucks_csv)
 ```
 
 In both options the output will be something like this:

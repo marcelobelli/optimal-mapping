@@ -3,15 +3,33 @@ from pathlib import Path
 
 import pytest
 
+from optimal_mapping.helpers import Cargo, Truck
+
 
 @pytest.fixture()
 def cargo_csv():
     return Path(__file__).absolute().parents[0] / "fixtures" / "cargo_ex.csv"
 
 
+@pytest.fixture
+def cargo():
+    return [
+        Cargo("Light bulbs", "Sikeston", "MO", "36.876719", "-89.5878579"),
+        Cargo("Apples", "Columbus", "OH", "39.9611755", "-82.99879419999999"),
+    ]
+
+
 @pytest.fixture()
 def trucks_csv():
     return Path(__file__).absolute().parents[0] / "fixtures" / "trucks_ex.csv"
+
+
+@pytest.fixture
+def trucks():
+    return [
+        Truck("Viking Products Of Austin Incustin", "36.6634467", "-87.47739020000002"),
+        Truck("Kjellberg'S Carpet Oneuffalo", "40.3933956", "-82.4857181"),
+    ]
 
 
 @pytest.fixture

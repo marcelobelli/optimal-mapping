@@ -1,6 +1,8 @@
 # python 3.8.0
 import numpy as np
 
+from optimal_mapping.helpers import get_cargo, get_distance_between, get_trucks
+
 
 class RouteAnalyzer:
     def __init__(self, matrix):
@@ -187,3 +189,13 @@ class RouteAnalyzer:
     def _subtract_value_from_undeleted_cells(self, value):
         for cell in self._get_undeleted_cells():
             self._matrix[cell[0]][cell[1]] -= value
+
+    @classmethod
+    def make_routes_combination(cls, cargo_csv, trucks_csv):
+        cargo = get_cargo(cargo_csv)
+        trucks = get_trucks(trucks_csv)
+        matrix = [[get_distance_between(load, truck) for load in cargo] for truck in trucks]
+        analyzer = cls(matrix)
+        combinations = analyzer.get_combinations()
+
+        return {trucks[x]: cargo[y] for x, y in combinations}
