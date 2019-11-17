@@ -16,8 +16,7 @@ class RouteAnalyzer:
     def _total_zero_values(self):
         return self._matrix.size - np.count_nonzero(self._matrix)
 
-    # TODO Melhorar o nome desse cara
-    def run(self):
+    def get_combinations(self):
         self._balance_matrix()
         self._matrix_reduction()
 

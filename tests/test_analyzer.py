@@ -61,17 +61,17 @@ def test_balance_matrix(original_matrix, expected_matrix):
     assert np.array_equal(analyzer._matrix, np.array(expected_matrix))
 
 
-def test_make_reductions(simple_matrix):
+def test_make_reductions(example_matrix):
     expected_result = [[2, 0, 3, 3], [3, 0, 0, 4], [2, 5, 0, 2], [3, 2, 0, 3]]
-    analyzer = RouteAnalyzer(simple_matrix)
+    analyzer = RouteAnalyzer(example_matrix)
     analyzer._make_reductions(analyzer._matrix)
 
     assert np.array_equal(analyzer._matrix, expected_result)
 
 
-def test_matrix_reduction(simple_matrix):
+def test_matrix_reduction(example_matrix):
     expected_matrix = [[0, 0, 3, 1], [1, 0, 0, 2], [0, 5, 0, 0], [1, 2, 0, 1]]
-    analyzer = RouteAnalyzer(simple_matrix)
+    analyzer = RouteAnalyzer(example_matrix)
     analyzer._matrix_reduction()
 
     assert np.array_equal(analyzer._matrix, expected_matrix)
@@ -155,8 +155,8 @@ def test_random_scanning():
     assert analyzer._zeros_scratched == {(0, 1), (2, 1), (0, 2)}
 
 
-def test_reset_scanning_values(simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
+def test_reset_scanning_values(example_matrix):
+    analyzer = RouteAnalyzer(example_matrix)
     analyzer._chosen_cells = [1, 2, 3]
     analyzer._vertical_lines = [1, 2, 3]
     analyzer._horizontal_lines = [1, 2, 3]
@@ -238,8 +238,8 @@ def test_get_min_value_from_undeleted_cells():
     assert result == 1
 
 
-def test_get_intersection_points(simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
+def test_get_intersection_points(example_matrix):
+    analyzer = RouteAnalyzer(example_matrix)
     analyzer._vertical_lines = {0, 1, 4}
     analyzer._horizontal_lines = {2}
     result = [x for x in analyzer._get_intersection_points()]
@@ -291,8 +291,8 @@ def test_sum_and_subtract_minimum_value_from_selected_cells():
     "cell, result",
     (((0, 0), True), ((1, 2), True), ((3, 3), True), ((4, 1), False), ((4, 4), False), ((5, 5), False)),
 )
-def test_is_a_valid_cell(cell, result, simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
+def test_is_a_valid_cell(cell, result, example_matrix):
+    analyzer = RouteAnalyzer(example_matrix)
 
     assert analyzer._is_a_valid_cell(cell) is result
 
@@ -312,46 +312,31 @@ def test_get_result(shape, chosen_cells, expected_result):
     assert analyzer._get_results() == expected_result
 
 
-def test_run_with_simple_matrix(simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
-    result = analyzer.run()
-
-    assert result == [(3, 2), (2, 3), (1, 1), (0, 0)]
-
-
-def test_run_with_complex_matrix():
-    matrix = np.array(
-        [[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]]
-    )
+def test_get_combinations():
+    matrix = [[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]]
     analyzer = RouteAnalyzer(matrix)
-    result = analyzer.run()
+    result = analyzer.get_combinations()
 
     assert result == [(0, 4), (1, 0), (4, 3), (3, 1), (2, 2)]
 
 
-def test_run_with_unbalanced_matrix():
-    matrix = np.array([[9, 12, 11], [8, 13, 17], [20, 12, 13], [21, 15, 17]])
+def test_get_combinations_with_unbalanced_matrix():
+    matrix = [[9, 12, 11], [8, 13, 17], [20, 12, 13], [21, 15, 17]]
     analyzer = RouteAnalyzer(matrix)
-    result = analyzer.run()
+    result = analyzer.get_combinations()
 
     assert result == [(1, 0), (0, 2), (2, 1)]
 
 
-def test_run_with_multiple_solutions_matrix():
-    matrix = np.array([[5, 8, 2, 6], [8, 9, 3, 9], [4, 8, 1, 7], [12, 10, 4, 8]])
+def test_get_combinations_with_matrix_with_multiple_solutions():
+    matrix = [[5, 8, 2, 6], [8, 9, 3, 9], [4, 8, 1, 7], [12, 10, 4, 8]]
     analyzer = RouteAnalyzer(matrix)
-    result = analyzer.run()
+    result = analyzer.get_combinations()
 
     assert result == [(0, 0), (2, 2), (3, 3), (1, 1)]
 
 
-# TODO  Rename everything
-
-
-def test_with_loadsmart_matrix(loadsmart_matrix):
-    matrix = np.array(loadsmart_matrix)
-
-    analyzer = RouteAnalyzer(matrix)
-    result = analyzer.run()
-
+def test_get_combinations_with_complex_matrix(complex_matrix):
+    analyzer = RouteAnalyzer(complex_matrix)
+    result = analyzer.get_combinations()
     assert result == [(8, 0), (24, 1), (27, 2), (43, 3), (16, 4), (20, 5), (42, 6)]

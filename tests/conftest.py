@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.fixture
-def simple_matrix():
+def example_matrix():
     return [
         [14, 12, 15, 15],
         [21, 18, 18, 22],
@@ -13,7 +13,7 @@ def simple_matrix():
 
 
 @pytest.fixture
-def loadsmart_matrix():
+def complex_matrix():
     return [
         [
             287.9114022038136,
