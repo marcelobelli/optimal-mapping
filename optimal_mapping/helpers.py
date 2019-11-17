@@ -8,7 +8,7 @@ Cargo = namedtuple("Cargo", ["product", "city", "state", "latitude", "longitude"
 Truck = namedtuple("Truck", ["truck", "latitude", "longitude"])
 
 
-def get_cargos(csv_file):
+def get_cargo(csv_file):
     with open(csv_file, "r") as file:
         reader = csv.DictReader(file)
         return [

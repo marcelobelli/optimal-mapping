@@ -1,5 +1,17 @@
 # python 3.8.0
+from pathlib import Path
+
 import pytest
+
+
+@pytest.fixture()
+def cargo_csv():
+    return Path(__file__).absolute().parents[0] / "fixtures" / "cargo_ex.csv"
+
+
+@pytest.fixture()
+def trucks_csv():
+    return Path(__file__).absolute().parents[0] / "fixtures" / "trucks_ex.csv"
 
 
 @pytest.fixture
