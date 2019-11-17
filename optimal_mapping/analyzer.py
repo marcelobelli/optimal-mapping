@@ -2,7 +2,6 @@
 import numpy as np
 
 
-#  TODO  Refatorar essa porra: https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html
 class RouteAnalyzer:
     def __init__(self, matrix):
         self._matrix = np.array(matrix)
@@ -28,7 +27,7 @@ class RouteAnalyzer:
             if len(self._chosen_cells) == self._matrix.shape[0]:
                 break
 
-            self.sum_and_subtract_minimum_value_from_selected_cells()
+            self._sum_and_subtract_minimum_value_from_selected_cells()
 
         return self._get_results()
 
@@ -73,7 +72,7 @@ class RouteAnalyzer:
                 break
             column_scanning_successful = self._columns_scanning()
 
-            if not row_scanning_successful or not column_scanning_successful:
+            if not row_scanning_successful and not column_scanning_successful:
                 self._random_scanning()
 
     def _reset_scanning_values(self):
@@ -88,15 +87,14 @@ class RouteAnalyzer:
             if x in self._horizontal_lines:
                 continue
 
-            zeros_from_row = [(x, y) for y in np.where(row == 0)[0]]
-            zeros_from_row = [zero for zero in zeros_from_row if zero not in self._zeros_scratched]
+            zeros_in_row = [(x, y) for y in np.where(row == 0)[0] if (x, y) not in self._zeros_scratched]
 
-            if len(zeros_from_row) != 1:
+            if len(zeros_in_row) != 1:
                 continue
 
             scanning_result = True
-            chosen_zero = zeros_from_row.pop()
-            vertical_line = chosen_zero[1]
+            chosen_zero = zeros_in_row.pop()
+            _, vertical_line = chosen_zero
             self._chosen_cells.append(chosen_zero)
             self._vertical_lines.append(vertical_line)
 
@@ -112,15 +110,16 @@ class RouteAnalyzer:
             if y in self._vertical_lines:
                 continue
 
-            zeros_from_column = [(x, y) for x in np.where(column == 0)[0]]
-            zeros_from_column = [zero for zero in zeros_from_column if zero not in self._zeros_scratched]
+            zeros_in_column = [
+                (x, y) for x in np.where(column == 0)[0] if (x, y) not in self._zeros_scratched
+            ]
 
-            if len(zeros_from_column) != 1:
+            if len(zeros_in_column) != 1:
                 continue
 
             scanning_result = True
-            chosen_zero = zeros_from_column.pop()
-            horizontal_line = chosen_zero[0]
+            chosen_zero = zeros_in_column.pop()
+            horizontal_line, _ = chosen_zero
             self._chosen_cells.append(chosen_zero)
             self._horizontal_lines.append(horizontal_line)
 
@@ -130,6 +129,29 @@ class RouteAnalyzer:
 
         return scanning_result
 
+    def _random_scanning(self):
+        for x, row in enumerate(self._matrix):
+            if x in self._horizontal_lines:
+                continue
+
+            zeros_from_row = [(x, y) for y in np.where(row == 0)[0] if (x, y) not in self._zeros_scratched]
+
+            if len(zeros_from_row) == 0:
+                continue
+
+            chosen_zero = zeros_from_row[0]
+            horizontal_line, vertical_line = chosen_zero
+            self._chosen_cells.append(chosen_zero)
+            self._vertical_lines.append(vertical_line)
+            self._horizontal_lines.append(horizontal_line)
+
+            column = self._matrix.transpose()[vertical_line]
+            zeros_from_column = np.where(column == 0)[0]
+            self._zeros_scratched |= {(x, vertical_line) for x in zeros_from_column}
+            self._zeros_scratched |= {zero for zero in zeros_from_row}
+
+            break
+
     def _get_results(self):
         if len(set(self._original_matrix_shape)) == 1:
             return self._chosen_cells
@@ -137,12 +159,12 @@ class RouteAnalyzer:
         return [cell for cell in self._chosen_cells if self._is_a_valid_cell(cell)]
 
     def _is_a_valid_cell(self, cell):
-        cell_row, cell_collumn = cell
+        cell_row, cell_column = cell
         rows, columns = self._original_matrix_shape
 
-        return cell_row < rows and cell_collumn < columns
+        return cell_row < rows and cell_column < columns
 
-    def sum_and_subtract_minimum_value_from_selected_cells(self):
+    def _sum_and_subtract_minimum_value_from_selected_cells(self):
         min_value = self._get_min_value_from_undeleted_cells()
         self._sum_value_at_intersection_points_cells(min_value)
         self._subtract_value_from_undeleted_cells(min_value)
@@ -162,35 +184,8 @@ class RouteAnalyzer:
             self._matrix[cell[0]][cell[1]] -= value
 
     def _get_undeleted_cells(self):
-        clear_rows = [row for row in range(self._matrix.shape[0]) if row not in self._horizontal_lines]
-        clear_columns = [
-            column for column in range(self._matrix.shape[1]) if column not in self._vertical_lines
-        ]
+        rows, columns = self._matrix.shape
+        clear_rows = [row for row in range(rows) if row not in self._horizontal_lines]
+        clear_columns = [column for column in range(columns) if column not in self._vertical_lines]
         return ((x, y) for x in clear_rows for y in clear_columns)
 
-    def _random_scanning(self):
-        for x, row in enumerate(self._matrix):
-            if x in self._horizontal_lines:
-                continue
-
-            zeros_from_row = [(x, y) for y in np.where(row == 0)[0]]
-            zeros_from_row = [zero for zero in zeros_from_row if zero not in self._zeros_scratched]
-
-            if len(zeros_from_row) == 0:
-                continue
-
-            chosen_zero = zeros_from_row.pop(0)
-            vertical_line = chosen_zero[1]
-            horizontal_line = chosen_zero[0]
-            self._chosen_cells.append(chosen_zero)
-            self._vertical_lines.append(vertical_line)
-            self._horizontal_lines.append(horizontal_line)
-
-            column = self._matrix.transpose()[vertical_line]
-            row = self._matrix[horizontal_line]
-            zeros_from_column = np.where(column == 0)[0]
-            zeros_from_row = np.where(row == 0)[0]
-            self._zeros_scratched |= {(x, vertical_line) for x in zeros_from_column}
-            self._zeros_scratched |= {(horizontal_line, y) for y in zeros_from_row}
-
-            break

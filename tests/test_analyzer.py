@@ -76,57 +76,97 @@ def test_matrix_reduction(simple_matrix):
     assert np.array_equal(analyzer._matrix, expected_matrix)
 
 
-def test_rows_scanning_doesnt_add_vertical_lines_if_zero_is_not_found():
+def test_rows_scanning_when_zero_is_not_found():
     matrix = np.array([[2, 4], [1, 9]])
     analyzer = RouteAnalyzer(matrix)
-    analyzer._rows_scanning()
+    result = analyzer._rows_scanning()
 
+    assert result is False
     assert analyzer._vertical_lines == []
+    assert analyzer._chosen_cells == []
+    assert analyzer._zeros_scratched == set()
 
 
-def test_rows_scanning_doesnt_add_vertical_lines_if_finds_more_than_one_zero():
+def test_rows_scanning_when_finds_more_than_one_zero():
     matrix = np.array([[2, 0, 4, 0, 1], [0, 1, 9, 0, 0]])
     analyzer = RouteAnalyzer(matrix)
-    analyzer._rows_scanning()
+    result = analyzer._rows_scanning()
 
+    assert result is False
     assert analyzer._vertical_lines == []
+    assert analyzer._chosen_cells == []
+    assert analyzer._zeros_scratched == set()
 
 
 def test_rows_scanning():
     matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
     analyzer = RouteAnalyzer(matrix)
-    analyzer._rows_scanning()
+    result = analyzer._rows_scanning()
 
+    assert result is True
     assert analyzer._chosen_cells == [(0, 4), (1, 0), (3, 1)]
     assert sorted(analyzer._vertical_lines) == [0, 1, 4]
     assert analyzer._zeros_scratched == {(0, 4), (3, 4), (1, 0), (4, 0), (3, 1)}
 
 
-def test_columns_scanning_doesnt_cadd_horizontal_lines_if_zero_is_not_found():
+def test_columns_scanning_when_zero_is_not_found():
     matrix = np.array([[2, 4], [1, 9]])
     analyzer = RouteAnalyzer(matrix)
-    analyzer._columns_scanning()
+    result = analyzer._columns_scanning()
 
+    assert result is False
     assert analyzer._horizontal_lines == []
+    assert analyzer._chosen_cells == []
+    assert analyzer._zeros_scratched == set()
 
 
-def test_columns_scanning_doesnt_add_horizontal_lines_if_finds_more_than_one_zero():
+def test_columns_scanning_when_finds_more_than_one_zero():
     matrix = np.array([[2, 4, 0, 1], [1, 9, 5, 0], [7, 1, 0, 0], [2, 1, 9, 0]])
     analyzer = RouteAnalyzer(matrix)
-    analyzer._columns_scanning()
+    result = analyzer._columns_scanning()
 
+    assert result is False
     assert analyzer._horizontal_lines == []
+    assert analyzer._chosen_cells == []
+    assert analyzer._zeros_scratched == set()
 
 
 def test_columns_scanning():
     matrix = np.array([[2, 4, 7, 2, 0], [0, 9, 7, 5, 4], [6, 7, 0, 0, 2], [2, 0, 1, 1, 0], [0, 5, 7, 1, 7]])
 
     analyzer = RouteAnalyzer(matrix)
-    analyzer._columns_scanning()
+    result = analyzer._columns_scanning()
 
+    assert result is True
     assert analyzer._chosen_cells == [(3, 1), (2, 2), (0, 4)]
     assert sorted(analyzer._horizontal_lines) == [0, 2, 3]
     assert analyzer._zeros_scratched == {(3, 1), (3, 4), (2, 2), (2, 3), (0, 4)}
+
+
+def test_random_scanning():
+    matrix = np.array([[2, 0, 0, 2], [4, 6, 0, 0], [2, 0, 2, 0], [0, 2, 3, 0]])
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._random_scanning()
+
+    assert analyzer._chosen_cells == [(0, 1)]
+    assert analyzer._vertical_lines == [1]
+    assert analyzer._horizontal_lines == [0]
+    assert analyzer._zeros_scratched == {(0, 1), (2, 1), (0, 2)}
+
+
+def test_reset_scanning_values(simple_matrix):
+    analyzer = RouteAnalyzer(simple_matrix)
+    analyzer._chosen_cells = [1, 2, 3]
+    analyzer._vertical_lines = [1, 2, 3]
+    analyzer._horizontal_lines = [1, 2, 3]
+    analyzer._zeros_scratched = {1, 2, 3}
+
+    analyzer._reset_scanning_values()
+
+    assert analyzer._chosen_cells == list()
+    assert analyzer._vertical_lines == list()
+    assert analyzer._horizontal_lines == list()
+    assert analyzer._zeros_scratched == set()
 
 
 def test_matrix_scanning():
@@ -153,19 +193,19 @@ def test_matrix_scanning_does_more_than_one_loop():
     assert analyzer._zeros_scratched == {(3, 2), (2, 3), (1, 1), (0, 0), (2, 2), (2, 0), (1, 2), (0, 1)}
 
 
-def test_reset_scanning_values(simple_matrix):
-    analyzer = RouteAnalyzer(simple_matrix)
-    analyzer._chosen_cells = [1, 2, 3]
-    analyzer._vertical_lines = [1, 2, 3]
-    analyzer._horizontal_lines = [1, 2, 3]
-    analyzer._zeros_scratched = {1, 2, 3}
+def test_matrix_scanning_with_multiple_solutions():
+    matrix = np.array([[0, 0, 0, 0],
+                       [5, 0, 0, 2],
+                       [0, 1, 0, 2],
+                       [8, 0, 0, 0]])
 
-    analyzer._reset_scanning_values()
+    analyzer = RouteAnalyzer(matrix)
+    analyzer._matrix_scanning()
 
-    assert analyzer._chosen_cells == list()
-    assert analyzer._vertical_lines == list()
-    assert analyzer._horizontal_lines == list()
-    assert analyzer._zeros_scratched == set()
+    assert analyzer._chosen_cells == [(0, 0), (2, 2), (3, 3), (1, 1)]
+    assert sorted(analyzer._vertical_lines) == [0, 1, 2]
+    assert sorted(analyzer._horizontal_lines) == [0, 3]
+    assert analyzer._zeros_scratched == {(3, 1), (3, 2), (3, 3), (0, 1), (1, 1), (1, 2), (0, 2), (2, 2), (2, 0), (0, 0), (0, 3)}
 
 
 def test_get_intersection_points(simple_matrix):
@@ -233,7 +273,7 @@ def test_run_with_simple_matrix(simple_matrix):
 
 def test_run_with_complex_matrix():
     matrix = np.array(
-        [[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14],]
+        [[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]]
     )
     analyzer = RouteAnalyzer(matrix)
     result = analyzer.run()
@@ -250,22 +290,16 @@ def test_run_with_unbalanced_matrix():
 
 
 def test_run_with_multiple_solutions_matrix():
-    matrix = np.array([[5, 8, 2, 6], [8, 9, 3, 9], [4, 8, 1, 7], [12, 10, 4, 8]])
+    matrix = np.array([
+        [5, 8, 2, 6],
+        [8, 9, 3, 9],
+        [4, 8, 1, 7],
+        [12, 10, 4, 8]
+    ])
     analyzer = RouteAnalyzer(matrix)
     result = analyzer.run()
 
     assert result == [(0, 0), (2, 2), (3, 3), (1, 1)]
-
-
-def test_random_scanning():
-    matrix = np.array([[2, 0, 0, 2], [4, 6, 0, 0], [2, 0, 2, 0], [0, 2, 3, 0]])
-    analyzer = RouteAnalyzer(matrix)
-    analyzer._random_scanning()
-
-    assert analyzer._chosen_cells == [(0, 1)]
-    assert analyzer._vertical_lines == [1]
-    assert analyzer._horizontal_lines == [0]
-    assert analyzer._zeros_scratched == {(0, 1), (2, 1), (0, 2)}
 
 
 # TODO  Rename everything
