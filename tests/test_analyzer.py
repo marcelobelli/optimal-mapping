@@ -313,7 +313,13 @@ def test_get_result(shape, chosen_cells, expected_result):
 
 
 def test_get_combinations():
-    matrix = [[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]]
+    matrix = [
+        [9, 11, 14, 11, 7],
+        [6, 15, 13, 13, 10],
+        [12, 13, 6, 8, 8],
+        [11, 9, 10, 12, 9],
+        [7, 12, 14, 10, 14],
+    ]
     analyzer = RouteAnalyzer(matrix)
     result = analyzer.get_combinations()
 

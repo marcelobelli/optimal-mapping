@@ -14,4 +14,4 @@ def map_best_combinations(cargos_csv, trucks_csv):
     for t, c in best_combinations:
         truck = trucks[t]
         cargo = cargos[c]
-        print(f"{truck.truck} is the truck chosen to get {cargo.product} from {cargo.city}, {cargo.state}")
+        print(f"* {truck.truck} is the truck chosen to get {cargo.product} from {cargo.city}, {cargo.state}")

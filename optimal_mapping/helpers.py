@@ -11,7 +11,12 @@ Truck = namedtuple("Truck", ["truck", "latitude", "longitude"])
 def get_cargos(csv_file):
     with open(csv_file, "r") as file:
         reader = csv.DictReader(file)
-        return [Cargo(row["product"], row["origin_city"], row["origin_state"], row["origin_lat"], row["origin_lng"]) for row in reader]
+        return [
+            Cargo(
+                row["product"], row["origin_city"], row["origin_state"], row["origin_lat"], row["origin_lng"]
+            )
+            for row in reader
+        ]
 
 
 def get_trucks(csv_file):
