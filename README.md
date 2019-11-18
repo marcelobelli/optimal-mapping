@@ -7,24 +7,24 @@
 * Used isort and black for code formatting
 
 
-### How To
+### How to run the project
 
-Using a terminal from the project root folder run the command `make deps`. This will install all the dependencies of the project.
+At the terminal, from the project root folder run the command `make deps`. This will install all the dependencies of the project.
 
  Then you have two options:
  
- 1) Using a terminal from the project root folder run `make run`. This will execute the algorithm with the **cargo.csv** and **trucks.csv** provided by the test.
+ 1) At the terminal, from the project root folder run `make run`. This will execute the algorithm with the **cargo.csv** and **trucks.csv** provided by the test.
  
  2) At the project root folder open a python shell. After that execute the commands:
 
 ```
 In [1]: from optimal_mapping import get_best_combination
 
-In [2]: cargos_csv = <PATH_TO_CARGOS_CSV>
+In [2]: cargo_csv = <PATH_TO_CARGO_CSV>
 
 In [3]: trucks_csv = <PATH_TO_TRUCKS_CSV>
 
-In [4]: get_best_combination(cargos_csv, trucks_csv)
+In [4]: get_best_combination(cargo_csv, trucks_csv)
 ```
 
 In both options the output will be something like this:
@@ -39,4 +39,6 @@ In both options the output will be something like this:
 * Fish-Bones Towingew York is the truck chosen to get Oranges from Fort Madison, IA
 ```
 
-Enjoy!
+### How to run the tests
+
+At the terminal, from the project root folder run the command `make test`.
